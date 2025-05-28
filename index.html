@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harmonia - Discover Your Perfect Sound</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Animated wave background */
+        .wave-bg {
+            background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wave-bg::before,
+        .wave-bg::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -2px;
+            background-repeat: repeat-x;
+            height: 20px;
+            background-size: 20px 20px;
+            background-image: radial-gradient(circle at 10px -5px, transparent 12px, rgba(255, 255, 255, 0.1) 13px);
+        }
+
+        .wave-bg::after {
+            bottom: -12px;
+            background-image: radial-gradient(circle at 10px -5px, transparent 12px, rgba(255, 255, 255, 0.05) 13px);
+        }
+
+        /* Music Waveform Visualization (static for now) */
+        .waveform {
+            background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='36' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 18 L3 14 L6 24 L9 10 L12 20 L15 16 L18 26 L21 8 L24 30 L27 4 L30 28 L33 16 L36 22 L39 12 L42 24 L45 18 L48 6 L51 32 L54 2 L57 28 L60 14 L63 22 L66 6 L69 26 L72 18 L75 12 L78 22 L81 8 L84 30 L87 4 L90 24 L93 16 L96 28 L99 18 L102 10 L105 26 L108 6 L111 30 L114 2 L117 22 L120 12 L123 28 L126 4 L129 32 L132 6 L135 26 L138 14 L141 22 L144 8 L147 30 L150 16 L153 22 L156 10 L159 20 L162 6 L165 26 L168 14 L171 30 L174 4 L177 24 L180 16 L183 28 L186 8 L189 32 L192 12 L195 22 L198 201 28' stroke='%236366f1' stroke-width='1.5' fill='none' opacity='0.8'/%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            height: 36px;
+        }
+
+        /* Audio player progress bar */
+        .audio-progress {
+            height: 4px;
+            background: linear-gradient(90deg, #4f46e5 var(--progress, 30%), #c7d2fe var(--progress, 30%));
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        /* Custom scrollbar for facet sections */
+        .facet-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .facet-scroll::-webkit-scrollbar-track {
+            background: #1e1e2f;
+        }
+
+        .facet-scroll::-webkit-scrollbar-thumb {
+            background: #4338ca;
+            border-radius: 3px;
+        }
+
+        /* Sound wave animation */
+        .sound-wave span {
+            display: inline-block;
+            width: 3px;
+            height: 100%;
+            margin: 0 1px;
+            background-color: #818cf8;
+            border-radius: 3px;
+            animation: sound-wave 1.2s infinite ease-in-out;
+        }
+
+        .sound-wave span:nth-child(1) { animation-delay: 0s; }
+        .sound-wave span:nth-child(2) { animation-delay: 0.1s; }
+        .sound-wave span:nth-child(3) { animation-delay: 0.2s; }
+        .sound-wave span:nth-child(4) { animation-delay: 0.3s; }
+        .sound-wave span:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes sound-wave {
+            0%, 100% { height: 8px; }
+            50% { height: 16px; }
+        }
+
+        /* Track item hover effect */
+        .track-item {
+            transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .track-item:hover {
+            transform: translateY(-2px);
+            background-color: rgba(79, 70, 229, 0.1);
+            border-color: #4f46e5; /* indigo-600 */
+        }
+
+        /* Neon glow effect for featured content */
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .neon-glow:hover {
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.8);
+        }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(90deg, #4f46e5 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Custom range input styling */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: #3730a3;
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #6366f1;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Custom checkbox styling */
+        .custom-checkbox {
+            position: relative;
+            padding-left: 30px;
+            cursor: pointer;
+        }
+
+        .custom-checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 18px;
+            width: 18px;
+            background-color: #1e1e2f;
+            border: 1px solid #4338ca;
+            border-radius: 3px;
+        }
+
+        .custom-checkbox input:checked ~ .checkmark {
+            background-color: #4f46e5;
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .custom-checkbox input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .custom-checkbox .checkmark:after {
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Active filter for sidebar links */
+        .active-filter {
+            color: #ec4899; /* Pink-500 for active state */
+            font-weight: bold;
+        }
+
+        /* Layout stability fix for main content */
+        .main-content-area {
+            flex-grow: 1;
+            flex-shrink: 0;
+            flex-basis: 0;
+            min-width: 0; /* Ensures it can shrink to 0 if flexbox needs it */
+
+            /* This min-width should be calculated based on the *max* width of the container
+               minus the sidebar width and gap. For `lg:w-3/4` in a `container mx-auto max-w-7xl`,
+               this can get complex. Best to ensure it's *at least* a reasonable width to avoid collapse.
+               A simple approach for `lg:w-3/4` and sidebar `lg:w-1/4` is to ensure `main-content-area` always
+               has enough space. Setting `min-width: 700px` (or similar) or `min-width: calc(100% - 300px)`
+               can sometimes work if the `flex-basis: 0` isn't enough on its own.
+               Let's rely on `flex-grow: 1` combined with `flex-shrink: 0` for both sides.
+            */
+            /* The parent div is `flex flex-col lg:flex-row gap-8`. Sidebar is `lg:w-1/4`. Main is `lg:w-3/4`.
+               These Tailwind classes typically handle the distribution well without explicit `min-width`
+               if `flex-shrink: 0` is on both. */
+        }
+        
+        /* Loading animation for grid */
+        .loading-grid {
+            min-height: 200px; /* Give some height to avoid layout shift */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            grid-column: 1 / -1; /* Span across all columns in the grid */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <header class="bg-gray-900 border-b border-indigo-900 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
+                        <i class="fas fa-music text-white"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold gradient-text">Harmonia</h1>
+                </div>
+
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="text-indigo-400 font-medium hover:text-indigo-300 transition-colors">Home</a>
+                    <a href="#" class="text-gray-400 font-medium hover:text-indigo-400 transition-colors">Discover</a>
+                    <a href="#" class="text-gray-400 font-medium hover:text-indigo-400 transition-colors">Genres</a>
+                    <a href="#" class="text-gray-400 font-medium hover:text-indigo-400 transition-colors">Charts</a>
+                    <a href="#" class="text-gray-400 font-medium hover:text-indigo-400 transition-colors">Artists</a>
+                </nav>
+
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-toggle" class="text-gray-400 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-indigo-400 transition-colors">
+                        <i class="far fa-heart"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-indigo-400 transition-colors">
+                        <i class="far fa-user"></i>
+                    </a>
+                    <button class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 px-4 rounded-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all">
+                        Sign Up
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="wave-bg py-16 sm:py-24">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">Discover <span class="gradient-text">Your Sound</span></h2>
+                <p class="text-indigo-200 mb-8 text-lg">Explore millions of tracks across all genres and moods</p>
+
+                <div class="flex justify-center h-6 mb-6">
+                    <div class="sound-wave">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+
+                <div class="relative mt-8 max-w-2xl mx-auto">
+                    <input
+                        type="text"
+                        id="main-search-input"
+                        placeholder="Search by song, artist, album or lyrics..."
+                        class="w-full px-6 py-4 bg-gray-800 bg-opacity-60 text-white border border-indigo-800 backdrop-filter backdrop-blur-sm rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    >
+                    <button class="absolute right-3 top-3 bg-indigo-600 text-white p-2 rounded-full hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                        <i class="fas fa-search text-lg px-1"></i>
+                    </button>
+                </div>
+
+                <div class="mt-10 overflow-hidden">
+                    <div class="marquee py-2 text-sm">
+                        <div class="marquee-content" id="trending-tags-marquee">
+                            <span class="inline-block mx-3 px-4 py-1 bg-indigo-900 bg-opacity-50 rounded-full">
+                                <i class="fas fa-fire text-red-400 mr-2"></i> Trending: Pop Hits
+                            </span>
+                            <span class="inline-block mx-3 px-4 py-1 bg-indigo-900 bg-opacity-50 rounded-full">
+                                <i class="fas fa-arrow-trend-up text-green-400 mr-2"></i> Rising: Indie Rock
+                            </span>
+                            <span class="inline-block mx-3 px-4 py-1 bg-indigo-900 bg-opacity-50 rounded-full">
+                                <i class="fas fa-globe text-blue-400 mr-2"></i> Global: K-Pop
+                            </span>
+                            <span class="inline-block mx-3 px-4 py-1 bg-indigo-900 bg-opacity-50 rounded-full">
+                                <i class="fas fa-calendar text-purple-400 mr-2"></i> New Releases
+                            </span>
+                            <span class="inline-block mx-3 px-4 py-1 bg-indigo-900 bg-opacity-50 rounded-full">
+                                <i class="fas fa-hashtag text-pink-400 mr-2"></i> #WorkoutMix
+                            </span>
+                            <span class="inline-block mx-3 px-4 py-1 bg-indigo-900 bg-opacity-50 rounded-full">
+                                <i class="fas fa-podcast text-yellow-400 mr-2"></i> Popular Podcasts
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <div class="w-full lg:w-1/4 flex-shrink-0 sidebar-area"> <div class="bg-gray-800 rounded-xl border border-indigo-900 p-6 sticky top-24">
+                    <h3 class="text-lg font-semibold text-gray-100 mb-4 flex items-center">
+                        <i class="fas fa-sliders-h mr-2 text-indigo-400"></i> Filter Results
+                    </h3>
+
+                    <div class="flex flex-wrap gap-2 mb-6" id="active-filters-container">
+                        <h4 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 w-full">Active Filters</h4>
+                        <div class="flex flex-wrap gap-2" id="active-filter-pills">
+                            </div>
+                        <button class="text-sm text-indigo-400 hover:text-indigo-300 mt-3" id="clear-all-filters">
+                            Clear all filters
+                        </button>
+                    </div>
+
+
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-indigo-300 mb-3 flex justify-between items-center">
+                            Genre
+                            <button class="text-indigo-400 text-xs hover:text-indigo-300" data-clear-facet="genre">Clear</button>
+                        </h4>
+                        <div class="max-h-48 overflow-y-auto facet-scroll space-y-2 pr-2" id="genre-filter-desktop">
+                            </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-indigo-300 mb-3 flex justify-between items-center">
+                            Mood
+                            <button class="text-indigo-400 text-xs hover:text-indigo-300" data-clear-facet="mood">Clear</button>
+                        </h4>
+                        <div class="max-h-48 overflow-y-auto facet-scroll space-y-2 pr-2" id="mood-filter-desktop">
+                            </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-indigo-300 mb-3 flex justify-between items-center">
+                            Tempo
+                            <button class="text-indigo-400 text-xs hover:text-indigo-300" data-clear-facet="tempo">Clear</button>
+                        </h4>
+                        <div class="max-h-48 overflow-y-auto facet-scroll space-y-2 pr-2" id="tempo-filter-desktop">
+                            </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-indigo-300 mb-3 flex justify-between items-center">
+                            Duration
+                            <button class="text-indigo-400 text-xs hover:text-indigo-300" data-clear-facet="duration">Clear</button>
+                        </h4>
+                        <div class="max-h-48 overflow-y-auto facet-scroll space-y-2 pr-2" id="duration-filter-desktop">
+                            </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-indigo-300 mb-3 flex justify-between items-center">
+                            Release Year
+                            <button class="text-indigo-400 text-xs hover:text-indigo-300" data-clear-facet="release_year">Clear</button>
+                        </h4>
+                        <div class="px-2">
+                            <div class="flex justify-between text-xs text-gray-500 mb-2">
+                                <span id="year-min-label-desktop">1900</span>
+                                <span id="year-max-label-desktop">2025</span>
+                            </div>
+                            <input type="range" id="year-range-desktop" min="1900" max="2025" value="1900" class="w-full">
+                            <div class="flex justify-between text-xs text-gray-500 mt-2">
+                                <input type="number" id="year-from-desktop" min="1900" max="2025" value="1900" class="w-24 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-gray-100 text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                <span class="text-gray-400">to</span>
+                                <input type="number" id="year-to-desktop" min="1900" max="2025" value="2025" class="w-24 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-gray-100 text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-4 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800">
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-3/4 main-content-area">
+                <div class="bg-gray-800 rounded-xl border border-indigo-900 p-6 mb-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-100">All Tracks</h2>
+                            <p class="text-sm text-gray-400" id="results-count-desktop-header">Showing 0-0 of 0 results</p>
+                        </div>
+
+                        <div class="flex items-center space-x-4 mt-4 sm:mt-0">
+                            <div class="flex items-center">
+                                <label for="sort-dropdown" class="text-sm text-gray-400 mr-2">Sort by:</label>
+                                <select id="sort-dropdown" class="text-sm bg-gray-800 text-gray-300 border-gray-700 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="play_count:DESC">Popularity</option>
+                                    <option value="release_year:DESC">Newest First</option>
+                                    <option value="release_year:ASC">Oldest First</option>
+                                    <option value="title:ASC">Title (A-Z)</option>
+                                    <option value="artist:ASC">Artist (A-Z)</option>
+                                    <option value="duration:DESC">Longest</option>
+                                    <option value="rating:DESC">Highest Rated</option>
+                                </select>
+                            </div>
+
+                            <div class="flex space-x-2">
+                                <button class="bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                                    <i class="fas fa-th-large"></i>
+                                </button>
+                                <button class="bg-gray-800 text-gray-400 p-2 rounded-md hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                                    <i class="fas fa-list"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="songs-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+                    <p class="col-span-full text-center text-gray-400 loading-grid">Loading tracks...</p>
+                </div>
+
+                <div class="mt-8 flex justify-center">
+                    <button id="load-more-button" class="px-6 py-3 bg-gray-800 border border-indigo-800 text-indigo-300 font-medium rounded-lg hover:bg-indigo-900 transition-colors hidden">
+                        Load More Tracks
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-indigo-900 p-3 md:hidden">
+        <div class="flex items-center space-x-3">
+            <img src="https://via.placeholder.com/50x50/3730a3/FFFFFF?text=🎵" alt="Current Track" class="w-10 h-10 rounded">
+            <div class="flex-1 truncate">
+                <div class="text-white text-sm font-medium truncate">Electric Dreams</div>
+                <div class="text-gray-400 text-xs truncate">Neon Pulse</div>
+            </div>
+            <div class="flex space-x-3">
+                <button class="text-gray-300 hover:text-white">
+                    <i class="fas fa-step-backward"></i>
+                </button>
+                <button class="bg-indigo-600 text-white p-2 rounded-full hover:bg-indigo-700">
+                    <i class="fas fa-pause"></i>
+                </button>
+                <button class="text-gray-300 hover:text-white">
+                    <i class="fas fa-step-forward"></i>
+                </button>
+            </div>
+        </div>
+        <div class="mt-2">
+            <div class="audio-progress"></div>
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>1:38</span>
+                <span>4:12</span>
+            </div>
+        </div>
+    </div>
+
+    <section class="py-12 bg-gray-900">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-xl mx-auto text-center">
+                <h3 class="text-2xl font-bold text-white mb-3">Never Miss a Beat</h3>
+                <p class="text-indigo-300 mb-6">Subscribe to our newsletter for new releases, playlists, and exclusive content</p>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input
+                        type="email"
+                        placeholder="Your email address"
+                        class="flex-1 px-4 py-3 rounded-md bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                    <button class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-md hover:from-indigo-700 hover:to-purple-700 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                        Subscribe
+                    </button>
+                </div>
+                <p class="text-xs text-gray-500 mt-3">We respect your privacy. Unsubscribe at any time.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-900 text-gray-400 py-10 border-t border-gray-800">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
+                            <i class="fas fa-music text-white text-xs"></i>
+                        </div>
+                        <h4 class="text-lg font-bold gradient-text">Harmonia</h4>
+                    </div>
+                    <p class="text-gray-500 text-sm">Harmonia is your premier music discovery platform. Find your perfect sound across millions of tracks from artists around the world.</p>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold text-white mb-4">Explore</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Home</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Discover</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Genres</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Charts</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Artists</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold text-white mb-4">Community</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">For Artists</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Developer API</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Partners</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Blog</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Community Guidelines</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold text-white mb-4">Support</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Help Center</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Copyright</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_KEY = 'sk_43133c09_4813181f1f39ff42b605b2c9fb2ebb3fd6c1de4d10fd772f07254d5b8ebfb526';
+        const BASE_URL = 'https://vectorhookcom-production.up.railway.app/api/collections/music-directory/search'; // Updated collection name
+        const COLLECTION_NAME = 'music-directory';
+
+        // UI Elements
+        const mainSearchInput = document.getElementById('main-search-input');
+        const songsGrid = document.getElementById('songs-grid'); // Changed from postsContainer
+        const resultsCountDesktopHeader = document.getElementById('results-count-desktop-header'); // Renamed for clarity
+        const activeFilterPillsContainer = document.getElementById('active-filter-pills'); // Renamed for clarity
+        const clearAllFiltersBtn = document.getElementById('clear-all-filters');
+        const sortDropdown = document.getElementById('sort-dropdown');
+
+        // Filter sections (Desktop)
+        const genreFilterDesktop = document.getElementById('genre-filter-desktop');
+        const moodFilterDesktop = document.getElementById('mood-filter-desktop');
+        const tempoFilterDesktop = document.getElementById('tempo-filter-desktop');
+        const durationFilterDesktop = document.getElementById('duration-filter-desktop');
+        const yearFromDesktop = document.getElementById('year-from-desktop');
+        const yearToDesktop = document.getElementById('year-to-desktop');
+        const yearRangeDesktop = document.getElementById('year-range-desktop'); // For range input
+
+        // Mobile drawer elements (Add corresponding IDs if these exist in mobile drawer)
+        const filterToggle = document.getElementById('mobile-menu-toggle'); // Using generic menu toggle
+        const mobileFilters = document.getElementById('mobile-menu-drawer') || document.createElement('div'); // Placeholder if no dedicated drawer in HTML
+        const closeMobileFilters = document.getElementById('close-mobile-filters-btn') || document.createElement('button'); // Placeholder
+        const applyFiltersMobileBtn = document.getElementById('apply-filters-mobile') || document.createElement('button');
+        const resetFiltersMobileBtn = document.getElementById('reset-filters-mobile') || document.createElement('button');
+        const genreFilterMobile = document.getElementById('genre-filter-mobile') || document.createElement('div');
+        const moodFilterMobile = document.getElementById('mood-filter-mobile') || document.createElement('div');
+        const tempoFilterMobile = document.getElementById('tempo-filter-mobile') || document.createElement('div');
+        const durationFilterMobile = document.getElementById('duration-filter-mobile') || document.createElement('div');
+        const yearFromMobile = document.getElementById('year-from-mobile') || document.createElement('input');
+        const yearToMobile = document.getElementById('year-to-mobile') || document.createElement('input');
+        const yearRangeMobile = document.getElementById('year-range-mobile') || document.createElement('input');
+
+        // Global state for filters and facets
+        let currentFilters = {
+            q: '*',
+            filter_by: {}, // e.g., { genre: 'Pop', mood: 'Energetic', duration: '<180' }
+        };
+        let currentSortBy = sortDropdown.value; // Initialize from default dropdown value
+
+        // Global sets to store all possible facet values found on initial load
+        let allGenres = new Set();
+        let allMoods = new Set();
+        let allTempos = new Set();
+        // Duration buckets are static and handled differently
+
+        // --- Helper Functions ---
+
+        function formatDuration(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // Function to create a song card element
+        function createSongCard(track) {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-indigo-600 transition-all duration-300 group track-item'; // Added track-item class
+            cardDiv.innerHTML = `
+                <div class="relative">
+                    <img src="${track.cover_image || 'https://via.placeholder.com/300x300?text=No+Cover'}" alt="${track.title} Cover" class="w-full h-40 sm:h-44 object-cover transition-transform duration-300 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button class="bg-indigo-600 text-white p-3 rounded-full hover:bg-indigo-500 transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    <div class="absolute top-2 right-2">
+                        <button class="text-gray-300 hover:text-pink-400 transition-colors bg-gray-900 bg-opacity-50 p-2 rounded-full">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                    ${track.release_year === new Date().getFullYear() ? '<div class="absolute top-2 left-2"><span class="bg-indigo-500 text-white text-xs py-1 px-2 rounded-md">New</span></div>' : ''}
+                </div>
+                <div class="p-4">
+                    <h3 class="text-white font-medium truncate">${track.title}</h3>
+                    <p class="text-gray-400 text-sm truncate mt-1">${track.artist}</p>
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="text-xs text-gray-500">${formatDuration(track.duration)}</span>
+                        <div class="flex items-center space-x-1">
+                            <div class="flex text-yellow-400 text-xs">
+                                ${createRatingStars(track.rating || 0)}
+                            </div>
+                            <span class="text-xs text-gray-500">(${track.play_count ? track.play_count.toLocaleString() : '0'})</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return cardDiv;
+        }
+
+        // Function to create star icons for rating display
+        function createRatingStars(rating) {
+            let starsHtml = '';
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 !== 0;
+
+            for (let i = 0; i < 5; i++) {
+                if (i < fullStars) {
+                    starsHtml += '<i class="fas fa-star"></i>';
+                } else if (hasHalfStar && i === fullStars) {
+                    starsHtml += '<i class="fas fa-star-half-alt"></i>';
+                } else {
+                    starsHtml += '<i class="far fa-star"></i>';
+                }
+            }
+            return starsHtml;
+        }
+
+        // Render song cards into the grid
+        function renderSongs(tracks, totalFound) {
+            songsGrid.innerHTML = ''; // Clear existing tracks
+            if (tracks && tracks.length > 0) {
+                tracks.forEach(hit => {
+                    const track = hit.document;
+                    songsGrid.appendChild(createSongCard(track));
+                });
+            } else {
+                songsGrid.innerHTML = '<p class="col-span-full text-center text-gray-400 loading-grid">No tracks found matching your criteria.</p>';
+            }
+            resultsCountDesktopHeader.textContent = `Showing 1-${tracks.length} of ${totalFound} results`; // Adjust pagination info
+        }
+
+        // Render active filter pills
+        function renderActiveFilterPills() {
+            activeFilterPillsContainer.innerHTML = '';
+            let hasActiveFilters = false;
+
+            for (const field in currentFilters.filter_by) {
+                const values = currentFilters.filter_by[field];
+                if (Array.isArray(values)) { // For multi-select fields like genre, mood, tempo
+                    values.forEach(value => {
+                        hasActiveFilters = true;
+                        const pill = document.createElement('div');
+                        pill.className = 'bg-indigo-900 bg-opacity-40 text-indigo-300 px-3 py-1 rounded-full text-sm flex items-center';
+                        pill.innerHTML = `
+                            ${value}
+                            <button class="ml-2 text-indigo-400 hover:text-indigo-300 focus:outline-none" data-remove-filter-field="${field}" data-remove-filter-value="${value}">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        `;
+                        activeFilterPillsContainer.appendChild(pill);
+                    });
+                } else if (typeof values === 'string' && values !== '*') { // For ranges or single values
+                    hasActiveFilters = true;
+                    const pill = document.createElement('div');
+                    pill.className = 'bg-indigo-900 bg-opacity-40 text-indigo-300 px-3 py-1 rounded-full text-sm flex items-center';
+                    let pillText = '';
+                    switch (field) {
+                        case 'duration':
+                            if (values === '<180') pillText = 'Duration: < 3 min';
+                            else if (values === '[180..300]') pillText = 'Duration: 3-5 min';
+                            else if (values === '>300') pillText = 'Duration: > 5 min';
+                            else pillText = `Duration: ${values}`;
+                            break;
+                        case 'release_year':
+                            const matchYearRange = values.match(/\[(\d+)\.\.(\d+)\]/);
+                            if (matchYearRange) {
+                                pillText = `Year: ${matchYearRange[1]}-${matchYearRange[2]}`;
+                            } else {
+                                pillText = `Year: ${values}`;
+                            }
+                            break;
+                        default:
+                            pillText = `${field}: ${values}`;
+                            break;
+                    }
+
+                    pill.innerHTML = `
+                        ${pillText}
+                        <button class="ml-2 text-indigo-400 hover:text-indigo-300 focus:outline-none" data-remove-filter-field="${field}">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    `;
+                    activeFilterPillsContainer.appendChild(pill);
+                }
+            }
+            clearAllFiltersBtn.style.display = hasActiveFilters ? 'inline-block' : 'none';
+        }
+
+        // Render facet filter options
+        function renderFacets(facetCounts, desktopOnly = false) {
+            const facetMaps = {};
+            facetCounts.forEach(facet => {
+                facetMaps[facet.field_name] = new Map();
+                facet.counts.forEach(item => {
+                    facetMaps[facet.field_name].set(item.value, item.count);
+                });
+            });
+
+            // Helper to render checkbox filter group
+            const renderCheckboxGroup = (container, fieldName, allValuesSet, currentActiveValues) => {
+                container.innerHTML = '';
+                Array.from(allValuesSet).sort().forEach(value => {
+                    const count = facetMaps[fieldName] ? facetMaps[fieldName].get(value) || 0 : 0;
+                    const labelDiv = document.createElement('label');
+                    labelDiv.className = 'flex items-center justify-between text-sm custom-checkbox text-gray-300';
+                    labelDiv.innerHTML = `
+                        <span>${value}</span>
+                        <input type="checkbox" data-facet-field="${fieldName}" value="${value}" ${currentActiveValues && currentActiveValues.includes(value) ? 'checked' : ''}>
+                        <span class="checkmark"></span>
+                        <span class="text-xs text-gray-500">${count}</span>
+                    `;
+                    container.appendChild(labelDiv);
+                });
+            };
+
+            // Genre Filter
+            const activeGenres = currentFilters.filter_by.genre || [];
+            renderCheckboxGroup(genreFilterDesktop, 'genre', allGenres, activeGenres);
+            if (!desktopOnly) {
+                renderCheckboxGroup(genreFilterMobile, 'genre', allGenres, activeGenres);
+            }
+
+            // Mood Filter
+            const activeMoods = currentFilters.filter_by.mood || [];
+            renderCheckboxGroup(moodFilterDesktop, 'mood', allMoods, activeMoods);
+            if (!desktopOnly) {
+                renderCheckboxGroup(moodFilterMobile, 'mood', allMoods, activeMoods);
+            }
+
+            // Tempo Filter
+            const activeTempos = currentFilters.filter_by.tempo || [];
+            renderCheckboxGroup(tempoFilterDesktop, 'tempo', allTempos, activeTempos);
+            if (!desktopOnly) {
+                renderCheckboxGroup(tempoFilterMobile, 'tempo', allTempos, activeTempos);
+            }
+
+            // Duration Filter (static buckets mapped to numerical ranges)
+            const durationBuckets = [
+                { label: 'Under 3 minutes', value: '<180' }, // < 180 seconds
+                { label: '3-5 minutes', value: '[180..300]' }, // 180 to 300 seconds
+                { label: 'Over 5 minutes', value: '>300' }  // > 300 seconds
+            ];
+            const renderDurationFilter = (container, currentActiveDuration) => {
+                container.innerHTML = '';
+                durationBuckets.forEach(bucket => {
+                    const count = facetMaps.duration ? facetMaps.duration.get(bucket.value) || 0 : '...'; // API might not bucket like this
+                    const isChecked = currentActiveDuration && currentActiveDuration.includes(bucket.value);
+                    const labelDiv = document.createElement('label');
+                    labelDiv.className = 'flex items-center justify-between text-sm custom-checkbox text-gray-300';
+                    labelDiv.innerHTML = `
+                        <span>${bucket.label}</span>
+                        <input type="checkbox" data-facet-field="duration" value="${bucket.value}" ${isChecked ? 'checked' : ''}>
+                        <span class="checkmark"></span>
+                        <span class="text-xs text-gray-500">${count}</span>
+                    `;
+                    container.appendChild(labelDiv);
+                });
+            };
+            const activeDuration = currentFilters.filter_by.duration || [];
+            renderDurationFilter(durationFilterDesktop, activeDuration);
+            if (!desktopOnly) {
+                renderDurationFilter(durationFilterMobile, activeDuration);
+            }
+
+
+            // Release Year Range Sliders & Inputs
+            const setupYearRange = (rangeInput, fromInput, toInput, minLabel, maxLabel) => {
+                // Initialize min/max values based on API's known range or a default
+                const currentYear = new Date().getFullYear();
+                const defaultMinYear = 1900;
+                const defaultMaxYear = currentYear;
+
+                let currentFrom = defaultMinYear;
+                let currentTo = defaultMaxYear;
+
+                // Check if release_year filter is active
+                if (currentFilters.filter_by.release_year) {
+                    const rangeMatch = currentFilters.filter_by.release_year.match(/\[(\d+)\.\.(\d+)\]/);
+                    if (rangeMatch) {
+                        currentFrom = parseInt(rangeMatch[1]);
+                        currentTo = parseInt(rangeMatch[2]);
+                    }
+                }
+
+                fromInput.value = currentFrom;
+                toInput.value = currentTo;
+                rangeInput.min = defaultMinYear;
+                rangeInput.max = defaultMaxYear;
+                rangeInput.value = currentFrom; // Set slider to "from" value
+
+                minLabel.textContent = defaultMinYear; // Static min label
+                maxLabel.textContent = defaultMaxYear; // Static max label
+
+                // Update text inputs based on range slider (simple one-way for now)
+                rangeInput.oninput = () => {
+                    fromInput.value = rangeInput.value;
+                    // For a single slider, you might update both from and to or only one end
+                    // For simplicity, we'll make the slider control the 'from' year
+                };
+
+                // Apply filter when number inputs change
+                fromInput.onchange = toInput.onchange = () => {
+                    let min = parseInt(fromInput.value);
+                    let max = parseInt(toInput.value);
+
+                    // Basic validation
+                    if (isNaN(min) || min < defaultMinYear) min = defaultMinYear;
+                    if (isNaN(max) || max > defaultMaxYear) max = defaultMaxYear;
+                    if (min > max) min = max; // Ensure from is not greater than to
+
+                    fromInput.value = min;
+                    toInput.value = max;
+                    rangeInput.value = min; // Sync slider with 'from'
+
+                    applyFilter('release_year', `[${min}..${max}]`, false); // release_year is single-select range
+                };
+
+                // Apply filter when range slider changes (on mouse up)
+                rangeInput.onmouseup = rangeInput.touchend = () => {
+                    const min = parseInt(fromInput.value);
+                    const max = parseInt(toInput.value);
+                    applyFilter('release_year', `[${min}..${max}]`, false);
+                };
+            };
+
+            const yearMinLabelDesktop = document.getElementById('year-min-label-desktop');
+            const yearMaxLabelDesktop = document.getElementById('year-max-label-desktop');
+            setupYearRange(yearRangeDesktop, yearFromDesktop, yearToDesktop, yearMinLabelDesktop, yearMaxLabelDesktop);
+
+            // If you have mobile year range inputs, repeat setupYearRange for them:
+            const yearMinLabelMobile = document.getElementById('year-min-label-mobile');
+            const yearMaxLabelMobile = document.getElementById('year-max-label-mobile');
+            if (yearRangeMobile && yearFromMobile && yearToMobile && yearMinLabelMobile && yearMaxLabelMobile) {
+                 setupYearRange(yearRangeMobile, yearFromMobile, yearToMobile, yearMinLabelMobile, yearMaxLabelMobile);
+            }
+        }
+
+
+        // --- Core Fetching Logic ---
+
+        async function fetchTracks(query = currentFilters.q, filters = currentFilters.filter_by, sortBy = currentSortBy) {
+            songsGrid.innerHTML = '<p class="col-span-full text-center text-gray-400 loading-grid">Loading tracks...</p>';
+            resultsCountDesktopHeader.textContent = `Loading...`;
+
+            currentFilters.q = query;
+            currentFilters.filter_by = filters;
+            currentSortBy = sortBy;
+
+            const headers = {
+                'X-API-KEY': API_KEY,
+                'Content-Type': 'application/json'
+            };
+
+            let apiUrl = BASE_URL;
+            let requestOptions = {};
+
+            const hasActiveFilters = Object.keys(filters).length > 0;
+            const hasSearchQuery = (query !== '*' && query !== '');
+
+            // All faceted fields from your music-directory collection schema
+            // Also include 'release_year' for range filtering, even if not a direct facet in the response
+            const allFacetFields = "genre,mood,tempo,duration";
+
+            if (hasActiveFilters || hasSearchQuery) {
+                apiUrl = BASE_URL.split('?')[0]; // Use POST endpoint
+                const payload = {
+                    q: hasSearchQuery ? query : '*',
+                    query_by: "title,artist,album,description,genre,mood,tags", // Relevant fields for search
+                    sort_by: sortBy,
+                    facet_by: allFacetFields,
+                    per_page: 12 // Number of results per page
+                };
+
+                // Construct filter_by string for POST payload
+                if (hasActiveFilters) {
+                    const filterParts = [];
+                    for (const field in filters) {
+                        const values = filters[field];
+                        if (Array.isArray(values)) { // For multi-select (genre, mood, tempo, duration)
+                            filterParts.push(`${field}:=[${values.map(v => `'${v}'`).join(',')}]`);
+                        } else if (typeof values === 'string' && values !== '*') { // For range filters (release_year)
+                            filterParts.push(`${field}:${values}`);
+                        }
+                    }
+                    payload.filter_by = filterParts.join(' && ');
+                }
+
+                requestOptions = {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(payload)
+                };
+            } else {
+                // Initial load: GET all tracks to get all facets
+                apiUrl += `?q=${encodeURIComponent(query)}&facet_by=${allFacetFields}&sort_by=${encodeURIComponent(sortBy)}`;
+                requestOptions = {
+                    method: 'GET',
+                    headers: headers
+                };
+            }
+
+            try {
+                const response = await fetch(apiUrl, requestOptions);
+                const data = await response.json();
+
+                if (data.success) {
+                    // Populate all possible facet values on the very first unrestricted load
+                    if (!hasActiveFilters && !hasSearchQuery) {
+                        data.data.facet_counts.forEach(facet => {
+                            if (facet.field_name === 'genre') {
+                                facet.counts.forEach(item => allGenres.add(item.value));
+                            } else if (facet.field_name === 'mood') {
+                                facet.counts.forEach(item => allMoods.add(item.value));
+                            } else if (facet.field_name === 'tempo') {
+                                facet.counts.forEach(item => allTempos.add(item.value));
+                            }
+                            // Duration facets are hardcoded buckets, not pulled dynamically like this.
+                        });
+                    }
+                    renderSongs(data.data.hits, data.data.found);
+                    renderFacets(data.data.facet_counts);
+                    renderActiveFilterPills();
+                } else {
+                    songsGrid.innerHTML = `<p class="col-span-full text-center text-red-500 loading-grid">Error: ${data.message || 'Failed to fetch tracks'}</p>`;
+                    resultsCountDesktopHeader.textContent = `Error loading results.`;
+                    console.error('API Error:', data);
+                }
+            } catch (error) {
+                songsGrid.innerHTML = '<p class="col-span-full text-center text-red-500 loading-grid">Network Error: Could not connect to the API.</p>';
+                resultsCountDesktopHeader.textContent = `Network error.`;
+                console.error('Fetch error:', error);
+            }
+        }
+
+
+        // --- Filter Application & Removal Logic ---
+
+        // Unified function to apply/toggle a filter and trigger search
+        function applyFilter(field, value, isMultiSelect = true) {
+            const newFilters = { ...currentFilters.filter_by };
+
+            if (isMultiSelect) { // For 'genre', 'mood', 'tempo', 'duration' (array types)
+                if (!newFilters[field]) {
+                    newFilters[field] = [];
+                }
+                if (newFilters[field].includes(value)) {
+                    newFilters[field] = newFilters[field].filter(v => v !== value);
+                } else {
+                    newFilters[field].push(value);
+                }
+                if (newFilters[field].length === 0) {
+                    delete newFilters[field];
+                }
+            } else { // For single-select filters like 'release_year' (range string)
+                if (newFilters[field] === value) {
+                    delete newFilters[field]; // Deselect if already active
+                } else {
+                    newFilters[field] = value;
+                }
+            }
+            fetchTracks(currentFilters.q, newFilters, currentSortBy);
+        }
+
+        // Function to remove a filter
+        function removeFilter(field, valueToRemove = null) {
+            const newFilters = { ...currentFilters.filter_by };
+
+            if (Array.isArray(newFilters[field])) { // For multi-select fields
+                if (valueToRemove) {
+                    newFilters[field] = newFilters[field].filter(v => v !== valueToRemove);
+                    if (newFilters[field].length === 0) {
+                        delete newFilters[field];
+                    }
+                }
+            } else { // For single-value or range filters
+                delete newFilters[field];
+            }
+            fetchTracks(currentFilters.q, newFilters, currentSortBy);
+        }
+
+        // --- Event Listeners ---
+
+        // Main Search Input
+        let searchTimeout;
+        mainSearchInput.addEventListener('keyup', (event) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = event.target.value.trim();
+                fetchTracks(query === '' ? '*' : query);
+            }, 500); // Debounce search
+        });
+
+        // Sort Dropdown
+        sortDropdown.addEventListener('change', (event) => {
+            fetchTracks(currentFilters.q, currentFilters.filter_by, event.target.value);
+        });
+
+        // Clear all filters button
+        clearAllFiltersBtn.addEventListener('click', () => {
+            currentFilters.filter_by = {};
+            // Also reset year range visually
+            yearFromDesktop.value = 1900;
+            yearToDesktop.value = new Date().getFullYear();
+            yearRangeDesktop.value = 1900; // Reset slider
+            if (yearFromMobile) { // Check if mobile elements exist
+                yearFromMobile.value = 1900;
+                yearToMobile.value = new Date().getFullYear();
+                yearRangeMobile.value = 1900;
+            }
+
+            fetchTracks(currentFilters.q, {});
+        });
+
+        // Event delegation for all sidebar filter clicks (desktop & mobile)
+        document.addEventListener('click', (event) => {
+            const target = event.target;
+
+            // Handle sorting links (if any, not explicitly in this HTML but kept from previous versions)
+            if (target.tagName === 'A' && target.dataset.sortBy) {
+                event.preventDefault();
+                // Remove active class from previous sort link
+                document.querySelectorAll('[data-sort-by]').forEach(link => link.classList.remove('active-filter'));
+                // Add active class to current sort link
+                target.classList.add('active-filter');
+                fetchTracks(currentFilters.q, currentFilters.filter_by, target.dataset.sortBy);
+            }
+            
+            // Handle Clear button for specific facets
+            if (target.tagName === 'BUTTON' && target.dataset.clearFacet) {
+                event.preventDefault();
+                const fieldToClear = target.dataset.clearFacet;
+                const newFilters = { ...currentFilters.filter_by };
+                delete newFilters[fieldToClear];
+                // Reset associated year range inputs if clearing release_year
+                if (fieldToClear === 'release_year') {
+                    yearFromDesktop.value = 1900;
+                    yearToDesktop.value = new Date().getFullYear();
+                    yearRangeDesktop.value = 1900;
+                    if (yearFromMobile) {
+                        yearFromMobile.value = 1900;
+                        yearToMobile.value = new Date().getFullYear();
+                        yearRangeMobile.value = 1900;
+                    }
+                }
+                fetchTracks(currentFilters.q, newFilters, currentSortBy);
+            }
+        });
+
+        // Event delegation for checkbox changes (Genre, Mood, Tempo, Duration)
+        document.addEventListener('change', (event) => {
+            const target = event.target;
+            if (target.type === 'checkbox' && target.dataset.facetField) {
+                const field = target.dataset.facetField;
+                const value = target.value;
+                applyFilter(field, value, true); // All these are multi-select
+            }
+        });
+
+        // Event listener for release year range inputs (desktop and mobile)
+        yearFromDesktop.addEventListener('change', () => {
+            const min = parseInt(yearFromDesktop.value);
+            const max = parseInt(yearToDesktop.value);
+            if (!isNaN(min) && !isNaN(max) && min <= max) {
+                applyFilter('release_year', `[${min}..${max}]`, false);
+            }
+        });
+        yearToDesktop.addEventListener('change', () => {
+            const min = parseInt(yearFromDesktop.value);
+            const max = parseInt(yearToDesktop.value);
+            if (!isNaN(min) && !isNaN(max) && min <= max) {
+                applyFilter('release_year', `[${min}..${max}]`, false);
+            }
+        });
+        yearRangeDesktop.addEventListener('mouseup', () => { // Or 'change' if you want continuous updates
+            // When slider is moved, update the 'from' year and apply filter for that point to max
+            const year = parseInt(yearRangeDesktop.value);
+            yearFromDesktop.value = year;
+            applyFilter('release_year', `[${year}..${yearToDesktop.value}]`, false);
+        });
+
+        // Mobile year range inputs (if they exist)
+        if (yearFromMobile) {
+            yearFromMobile.addEventListener('change', () => {
+                const min = parseInt(yearFromMobile.value);
+                const max = parseInt(yearToMobile.value);
+                if (!isNaN(min) && !isNaN(max) && min <= max) {
+                    applyFilter('release_year', `[${min}..${max}]`, false);
+                }
+            });
+            yearToMobile.addEventListener('change', () => {
+                const min = parseInt(yearFromMobile.value);
+                const max = parseInt(yearToMobile.value);
+                if (!isNaN(min) && !isNaN(max) && min <= max) {
+                    applyFilter('release_year', `[${min}..${max}]`, false);
+                }
+            });
+            yearRangeMobile.addEventListener('mouseup', () => {
+                const year = parseInt(yearRangeMobile.value);
+                yearFromMobile.value = year;
+                applyFilter('release_year', `[${year}..${yearToMobile.value}]`, false);
+            });
+        }
+
+
+        // --- Mobile Filter Drawer Logic (already present, ensured element IDs match placeholders) ---
+
+        // Toggle visibility and animation classes
+        if (filterToggle) {
+            filterToggle.addEventListener('click', () => {
+                mobileFilters.style.display = 'block';
+                setTimeout(() => {
+                    mobileFilters.classList.remove('drawer-closed');
+                    mobileFilters.classList.add('drawer-open');
+                }, 10);
+            });
+        }
+
+        if (closeMobileFilters) {
+            closeMobileFilters.addEventListener('click', () => {
+                mobileFilters.classList.remove('drawer-open');
+                mobileFilters.classList.add('drawer-closed');
+                setTimeout(() => {
+                    mobileFilters.style.display = 'none';
+                }, 300); // Match CSS transition duration
+            });
+        }
+        
+        // Mobile Apply/Reset Buttons (event listeners for buttons that were placeholders)
+        if (applyFiltersMobileBtn) {
+            applyFiltersMobileBtn.addEventListener('click', () => {
+                // For simplicity, directly re-fetch with current global filters state
+                fetchTracks(currentFilters.q, currentFilters.filter_by, currentSortBy);
+                if (closeMobileFilters) closeMobileFilters.click(); // Close drawer after applying
+            });
+        }
+
+        if (resetFiltersMobileBtn) {
+            resetFiltersMobileBtn.addEventListener('click', () => {
+                currentFilters.filter_by = {}; // Reset all filters
+                mainSearchInput.value = ''; // Clear search input visually
+                // Reset year range visually for mobile
+                yearFromDesktop.value = 1900;
+                yearToDesktop.value = new Date().getFullYear();
+                yearRangeDesktop.value = 1900;
+                if (yearFromMobile) {
+                    yearFromMobile.value = 1900;
+                    yearToMobile.value = new Date().getFullYear();
+                    yearRangeMobile.value = 1900;
+                }
+                fetchTracks('*', {}); // Re-fetch all
+                if (closeMobileFilters) closeMobileFilters.click(); // Close drawer
+            });
+        }
+
+
+        // Initial Load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchTracks(); // Fetch initial tracks on page load
+        });
+    </script>
+</body>
+</html>
