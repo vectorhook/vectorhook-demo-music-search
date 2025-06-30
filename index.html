@@ -213,6 +213,96 @@
             justify-content: center;
             grid-column: 1 / -1; /* Span across all columns in the grid */
         }
+
+        /* AI Assistant Widget Styling */
+#ai-assistant-widget {
+    bottom: 2rem;
+    right: 2rem;
+    width: 24rem;
+    height: auto;
+    max-height: 80vh;
+    position: fixed;
+    z-index: 1000;
+    resize: both;
+    overflow: auto;
+}
+
+#ai-assistant-widget.collapsed {
+    width: 0;
+    height: 0;
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0);
+    transform-origin: bottom right;
+    transition: all 0.3s ease-in-out;
+}
+
+#ai-assistant-widget:not(.collapsed) {
+    width: 24rem;
+    max-height: 80vh;
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+    transition: all 0.3s ease-in-out;
+}
+
+/* Hide internal elements when collapsed */
+#ai-assistant-widget.collapsed #ai-chat-conversation,
+#ai-assistant-widget.collapsed #ai-quick-actions,
+#ai-assistant-widget.collapsed #ai-chat-input-area {
+    display: none;
+}
+
+/* Draggable Header specific style */
+#ai-assistant-header {
+    cursor: grab;
+    user-select: none;
+}
+
+/* Chat message bubbles styling */
+.user-message {
+    background-color: #4338ca; /* Indigo-700 for user messages */
+    color: #e0e7ff; /* Indigo-100 */
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+.ai-message {
+    background-color: #1e1b4b; /* Darker background for AI messages */
+    color: #cbd5e1; /* Gray-300 */
+    align-self: flex-start;
+    margin-right: auto;
+}
+
+#ai-chat-conversation {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Custom scrollbar for conversation area */
+#ai-chat-conversation::-webkit-scrollbar {
+    width: 4px;
+}
+
+#ai-chat-conversation::-webkit-scrollbar-track {
+    background: #1e1e2f;
+}
+
+#ai-chat-conversation::-webkit-scrollbar-thumb {
+    background: #4338ca;
+    border-radius: 3px;
+}
+
+#ai-chat-conversation::-webkit-scrollbar-thumb:hover {
+    background: #6366f1;
+}
+
+/* Ensure prompt buttons stack nicely */
+.flex-wrap > .flex-1 {
+    flex-basis: calc(50% - 0.25rem);
+}
     </style>
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen">
@@ -484,6 +574,60 @@
         </div>
     </section>
 
+    <div id="ai-assistant-widget" class="fixed bottom-8 right-8 z-50 w-80 shadow-xl rounded-lg overflow-hidden bg-gray-800 border border-indigo-900" style="cursor: grab;">
+    <div id="ai-assistant-header" class="flex items-center justify-between p-4 bg-gray-900 border-b border-indigo-900 text-gray-100" style="cursor: grab;">
+        <div class="flex items-center">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center mr-3">
+                <i class="fas fa-robot text-white text-lg"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-base">AI Assistant</h3>
+                <p class="text-xs text-gray-400" id="conversation-count">1 conversations</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button id="ai-collapse-button" class="text-gray-400 hover:text-gray-200">
+                <i class="fas fa-angle-down"></i> </button>
+        </div>
+    </div>
+
+    <div id="ai-chat-conversation" class="p-4 bg-gray-800 overflow-y-auto" style="max-height: 300px;">
+        <div class="ai-message bg-gray-900 text-gray-200 p-3 rounded-lg shadow-sm mb-3">
+            <p class="text-sm">Hello! I'm your AI Music Assistant. How can I help you discover your perfect sound today?</p>
+        </div>
+    </div>
+
+    <div id="ai-quick-actions" class="p-4 bg-gray-900 border-t border-indigo-900 flex flex-wrap gap-2">
+        <button class="flex-1 min-w-0 max-w-full inline-flex items-center justify-center px-3 py-2 text-xs font-medium text-gray-300 bg-gray-800 rounded-lg hover:bg-gray-700 hover:text-white transition-colors">
+            <i class="fas fa-chart-bar mr-1"></i> Give Insights
+        </button>
+        <button class="flex-1 min-w-0 max-w-full inline-flex items-center justify-center px-3 py-2 text-xs font-medium text-gray-300 bg-gray-800 rounded-lg hover:bg-gray-700 hover:text-white transition-colors">
+            <i class="fas fa-clipboard-list mr-1"></i> Summarize my search
+        </button>
+    </div>
+
+    <div id="ai-chat-input-area" class="p-4 bg-gray-900 border-t border-indigo-900 flex items-center">
+        <div class="relative flex-grow">
+            <input
+                type="text"
+                id="ai-user-input"
+                class="w-full pl-10 pr-4 py-2 border border-gray-700 rounded-full bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="Ask your AI assistant anything..."
+            >
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-robot text-gray-500"></i>
+            </div>
+        </div>
+        <button id="ai-send-button" class="ml-3 p-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors flex-shrink-0">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+<button id="ai-chat-bubble" class="fixed bottom-8 right-8 z-50 w-16 h-16 rounded-full bg-indigo-600 shadow-xl flex items-center justify-center text-white text-2xl hidden cursor-pointer hover:bg-indigo-700 transition-colors">
+    <i class="fas fa-comment-dots"></i>
+</button>
+
     <footer class="bg-gray-900 text-gray-400 py-10 border-t border-gray-800">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -546,10 +690,11 @@
             </div>
         </div>
     </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/15.0.7/marked.min.js"></script>
 
     <script>
         const API_KEY = 'sk_43133c09_4813181f1f39ff42b605b2c9fb2ebb3fd6c1de4d10fd772f07254d5b8ebfb526';
-        const BASE_URL = 'https://vectorhookcom-production.up.railway.app/api/collections/music-directory/search'; // Updated collection name
+        const BASE_URL = 'https://vectorhookcom-production.up.railway.app/api/collections/music-directory/vector-search'; // Updated collection name
         const COLLECTION_NAME = 'music-directory';
 
         // UI Elements
@@ -582,10 +727,191 @@
         const yearFromMobile = document.getElementById('year-from-mobile') || document.createElement('input');
         const yearToMobile = document.getElementById('year-to-mobile') || document.createElement('input');
         const yearRangeMobile = document.getElementById('year-range-mobile') || document.createElement('input');
+// Add these new constants near the top of your script, with other UI elements
+const aiAssistantWidget = document.getElementById('ai-assistant-widget');
+const aiAssistantHeader = document.getElementById('ai-assistant-header');
+const aiChatConversation = document.getElementById('ai-chat-conversation');
+const aiUserInput = document.getElementById('ai-user-input');
+const aiSendButton = document.getElementById('ai-send-button');
+const conversationCount = document.getElementById('conversation-count');
+const aiCollapseButton = document.getElementById('ai-collapse-button');
+const aiChatBubble = document.getElementById('ai-chat-bubble');
+const aiQuickActions = document.getElementById('ai-quick-actions'); // Added ID for quick actions div
+const aiChatInputArea = document.getElementById('ai-chat-input-area'); // Added ID for input area div
 
+const AI_CHAT_URL = 'https://vectorhookcom-production.up.railway.app/api/collections/music-directory/chat'; // <-- MAKE SURE THIS IS CORRECT FOR MUSIC!
+let currentConversationId = null;
+let isChatWidgetOpen = true; // Widget starts open
+
+// Helper to append a message to the conversation
+function appendMessage(sender, message) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `p-3 rounded-lg shadow-sm mb-3 text-sm max-w-[85%] break-words`;
+
+    if (sender === 'user') {
+        messageDiv.classList.add('user-message', 'ml-auto');
+        messageDiv.innerHTML = `<p>${message}</p>`; // User messages are plain text
+    } else { // sender === 'ai'
+        messageDiv.classList.add('ai-message', 'mr-auto');
+        // Use marked.parse() to convert Markdown to HTML for AI messages
+        messageDiv.innerHTML = marked.parse(message);
+    }
+    aiChatConversation.appendChild(messageDiv);
+    aiChatConversation.scrollTop = aiChatConversation.scrollHeight; // Auto-scroll to bottom
+}
+
+async function sendAiMessage() {
+    const message = aiUserInput.value.trim();
+    if (!message) return;
+
+    appendMessage('user', message);
+    aiUserInput.value = '';
+
+    const typingIndicator = document.createElement('div');
+    typingIndicator.className = 'ai-message bg-gray-900 p-3 rounded-lg shadow-sm mb-3 text-sm max-w-[85%] break-words animate-pulse'; // Adjusted for music theme
+    typingIndicator.innerHTML = '<p class="text-gray-500">AI is typing...</p>';
+    aiChatConversation.appendChild(typingIndicator);
+    aiChatConversation.scrollTop = aiChatConversation.scrollHeight;
+
+    aiSendButton.disabled = true;
+    aiUserInput.disabled = true;
+
+    const headers = {
+        'X-API-KEY': API_KEY,
+        'Content-Type': 'application/json'
+    };
+
+    const payload = {
+        message: message
+    };
+
+    if (currentConversationId) {
+        payload.conversation_id = currentConversationId;
+    }
+
+    try {
+        const response = await fetch(AI_CHAT_URL, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        aiChatConversation.removeChild(typingIndicator);
+
+        if (data.success) {
+            currentConversationId = data.data.conversation_id;
+            appendMessage('ai', data.data.answer);
+
+            const aiResponseResults = data.data.results;
+            if (aiResponseResults && aiResponseResults.length > 0 && aiResponseResults[0].hits) {
+                const hits = aiResponseResults[0].hits;
+                const totalFound = aiResponseResults[0].found;
+
+                renderSongs(hits, totalFound); // <-- IMPORTANT: Use renderSongs for music platform
+
+                // You might want to update the main search input here as well
+                if (data.data.message) {
+                    mainSearchInput.value = data.data.message;
+                }
+            } else {
+                songsGrid.innerHTML = '<p class="col-span-full text-center text-gray-400 loading-grid">AI found no specific tracks for this query.</p>';
+                resultsCountDesktopHeader.textContent = `0 results found`;
+            }
+        } else {
+            appendMessage('ai', `<p class="text-red-500">Error: ${data.message || 'Failed to get AI response.'}</p>`);
+            console.error('AI Chat Error:', data);
+        }
+    } catch (error) {
+        if (aiChatConversation.contains(typingIndicator)) {
+            aiChatConversation.removeChild(typingIndicator);
+        }
+        appendMessage('ai', '<p class="text-red-500">Network Error: Could not connect to AI.</p>');
+        console.error('AI Chat Fetch Error:', error);
+    } finally {
+        aiSendButton.disabled = false;
+        aiUserInput.disabled = false;
+        aiUserInput.focus();
+    }
+}
+
+// --- Widget Collapse/Expand Logic ---
+function toggleChatWidget() {
+    if (isChatWidgetOpen) {
+        aiAssistantWidget.classList.add('collapsed');
+        aiChatBubble.classList.remove('hidden');
+        aiCollapseButton.querySelector('i').className = 'fas fa-angle-up';
+        isChatWidgetOpen = false;
+    } else {
+        aiAssistantWidget.classList.remove('collapsed');
+        aiChatBubble.classList.add('hidden');
+        aiCollapseButton.querySelector('i').className = 'fas fa-angle-down';
+        isChatWidgetOpen = true;
+        aiChatConversation.scrollTop = aiChatConversation.scrollHeight;
+        aiUserInput.focus();
+    }
+}
+
+// --- Draggable Widget Logic ---
+let isDragging = false;
+let offsetX, offsetY;
+
+aiAssistantHeader.addEventListener('mousedown', (e) => {
+    if (!isChatWidgetOpen) return; // Only allow dragging if the widget is open
+    isDragging = true;
+    offsetX = e.clientX - aiAssistantWidget.getBoundingClientRect().left;
+    offsetY = e.clientY - aiAssistantWidget.getBoundingClientRect().top;
+    aiAssistantWidget.style.cursor = 'grabbing';
+});
+
+document.addEventListener('mousemove', (e) => {
+    if (!isDragging || !isChatWidgetOpen) return; // Only drag if open
+
+    let newX = e.clientX - offsetX;
+    let newY = e.clientY - offsetY;
+
+    const maxX = window.innerWidth - aiAssistantWidget.offsetWidth;
+    const maxY = window.innerHeight - aiAssistantWidget.offsetHeight;
+
+    newX = Math.max(0, Math.min(newX, maxX));
+    newY = Math.max(0, Math.min(newY, maxY));
+
+    aiAssistantWidget.style.left = newX + 'px';
+    aiAssistantWidget.style.top = newY + 'px';
+    aiAssistantWidget.style.right = 'auto'; // Disable right/bottom constraints when dragging
+    aiAssistantWidget.style.bottom = 'auto';
+});
+
+document.addEventListener('mouseup', () => {
+    if (isDragging) {
+        aiAssistantWidget.style.cursor = 'grab';
+    }
+    isDragging = false;
+});
+
+// --- Event Listeners for AI Chat and Widget Control ---
+aiSendButton.addEventListener('click', sendAiMessage);
+aiUserInput.addEventListener('keyup', (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendAiMessage();
+    }
+});
+aiCollapseButton.addEventListener('click', toggleChatWidget);
+aiChatBubble.addEventListener('click', toggleChatWidget);
+
+
+// Initial Load
+document.addEventListener('DOMContentLoaded', () => {
+    fetchTracks(); // Fetch initial tracks on page load
+    // Ensure widget starts open and bubble is hidden
+    aiAssistantWidget.classList.remove('collapsed');
+    aiChatBubble.classList.add('hidden');
+});
         // Global state for filters and facets
         let currentFilters = {
-            q: '*',
+            query: '*',
             filter_by: {}, // e.g., { genre: 'Pop', mood: 'Energetic', duration: '<180' }
         };
         let currentSortBy = sortDropdown.value; // Initialize from default dropdown value
@@ -605,41 +931,48 @@
         }
 
         // Function to create a song card element
-        function createSongCard(track) {
-            const cardDiv = document.createElement('div');
-            cardDiv.className = 'bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-indigo-600 transition-all duration-300 group track-item'; // Added track-item class
-            cardDiv.innerHTML = `
-                <div class="relative">
-                    <img src="${track.cover_image || 'https://via.placeholder.com/300x300?text=No+Cover'}" alt="${track.title} Cover" class="w-full h-40 sm:h-44 object-cover transition-transform duration-300 group-hover:scale-105">
-                    <div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <button class="bg-indigo-600 text-white p-3 rounded-full hover:bg-indigo-500 transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300">
-                            <i class="fas fa-play"></i>
-                        </button>
-                    </div>
-                    <div class="absolute top-2 right-2">
-                        <button class="text-gray-300 hover:text-pink-400 transition-colors bg-gray-900 bg-opacity-50 p-2 rounded-full">
-                            <i class="far fa-heart"></i>
-                        </button>
-                    </div>
-                    ${track.release_year === new Date().getFullYear() ? '<div class="absolute top-2 left-2"><span class="bg-indigo-500 text-white text-xs py-1 px-2 rounded-md">New</span></div>' : ''}
-                </div>
-                <div class="p-4">
-                    <h3 class="text-white font-medium truncate">${track.title}</h3>
-                    <p class="text-gray-400 text-sm truncate mt-1">${track.artist}</p>
-                    <div class="flex justify-between items-center mt-3">
-                        <span class="text-xs text-gray-500">${formatDuration(track.duration)}</span>
-                        <div class="flex items-center space-x-1">
-                            <div class="flex text-yellow-400 text-xs">
-                                ${createRatingStars(track.rating || 0)}
-                            </div>
-                            <span class="text-xs text-gray-500">(${track.play_count ? track.play_count.toLocaleString() : '0'})</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            return cardDiv;
-        }
+   // In your index.html's <script> section:
+function createSongCard(track) {
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-indigo-600 transition-all duration-300 group track-item';
 
+    // Add click event listener to the card for navigation
+    cardDiv.addEventListener('click', () => {
+        // Navigate to the music_details.html page with the track's ID
+        window.open(`music_details.html?id=${track.id}`, '_blank'); // Open in new tab
+    });
+
+    cardDiv.innerHTML = `
+        <div class="relative">
+            <img src="${track.cover_image || 'https://via.placeholder.com/300x300?text=No+Cover'}" alt="${track.title} Cover" class="w-full h-40 sm:h-44 object-cover transition-transform duration-300 group-hover:scale-105">
+            <div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button class="bg-indigo-600 text-white p-3 rounded-full hover:bg-indigo-500 transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300">
+                    <i class="fas fa-play"></i>
+                </button>
+            </div>
+            <div class="absolute top-2 right-2">
+                <button class="text-gray-300 hover:text-pink-400 transition-colors bg-gray-900 bg-opacity-50 p-2 rounded-full">
+                    <i class="far fa-heart"></i>
+                </button>
+            </div>
+            ${track.release_year === new Date().getFullYear() ? '<div class="absolute top-2 left-2"><span class="bg-indigo-500 text-white text-xs py-1 px-2 rounded-md">New</span></div>' : ''}
+        </div>
+        <div class="p-4">
+            <h3 class="text-white font-medium truncate">${track.title}</h3>
+            <p class="text-gray-400 text-sm truncate mt-1">${track.artist}</p>
+            <div class="flex justify-between items-center mt-3">
+                <span class="text-xs text-gray-500">${formatDuration(track.duration)}</span>
+                <div class="flex items-center space-x-1">
+                    <div class="flex text-yellow-400 text-xs">
+                        ${createRatingStars(track.rating || 0)}
+                    </div>
+                    <span class="text-xs text-gray-500">(${track.play_count ? track.play_count.toLocaleString() : '0'})</span>
+                </div>
+            </div>
+        </div>
+    `;
+    return cardDiv;
+}
         // Function to create star icons for rating display
         function createRatingStars(rating) {
             let starsHtml = '';
@@ -881,11 +1214,11 @@
 
         // --- Core Fetching Logic ---
 
-        async function fetchTracks(query = currentFilters.q, filters = currentFilters.filter_by, sortBy = currentSortBy) {
+        async function fetchTracks(query = currentFilters.query, filters = currentFilters.filter_by, sortBy = currentSortBy) {
             songsGrid.innerHTML = '<p class="col-span-full text-center text-gray-400 loading-grid">Loading tracks...</p>';
             resultsCountDesktopHeader.textContent = `Loading...`;
 
-            currentFilters.q = query;
+            currentFilters.query = query;
             currentFilters.filter_by = filters;
             currentSortBy = sortBy;
 
@@ -907,7 +1240,7 @@
             if (hasActiveFilters || hasSearchQuery) {
                 apiUrl = BASE_URL.split('?')[0]; // Use POST endpoint
                 const payload = {
-                    q: hasSearchQuery ? query : '*',
+                    query: hasSearchQuery ? query : '*',
                     query_by: "title,artist,album,description,genre,mood,tags", // Relevant fields for search
                     sort_by: sortBy,
                     facet_by: allFacetFields,
@@ -935,7 +1268,7 @@
                 };
             } else {
                 // Initial load: GET all tracks to get all facets
-                apiUrl += `?q=${encodeURIComponent(query)}&facet_by=${allFacetFields}&sort_by=${encodeURIComponent(sortBy)}`;
+                apiUrl += `?query=${encodeURIComponent(query)}&facet_by=${allFacetFields}&sort_by=${encodeURIComponent(sortBy)}`;
                 requestOptions = {
                     method: 'GET',
                     headers: headers
@@ -1001,7 +1334,7 @@
                     newFilters[field] = value;
                 }
             }
-            fetchTracks(currentFilters.q, newFilters, currentSortBy);
+            fetchTracks(currentFilters.query, newFilters, currentSortBy);
         }
 
         // Function to remove a filter
@@ -1018,7 +1351,7 @@
             } else { // For single-value or range filters
                 delete newFilters[field];
             }
-            fetchTracks(currentFilters.q, newFilters, currentSortBy);
+            fetchTracks(currentFilters.query, newFilters, currentSortBy);
         }
 
         // --- Event Listeners ---
@@ -1035,7 +1368,7 @@
 
         // Sort Dropdown
         sortDropdown.addEventListener('change', (event) => {
-            fetchTracks(currentFilters.q, currentFilters.filter_by, event.target.value);
+            fetchTracks(currentFilters.query, currentFilters.filter_by, event.target.value);
         });
 
         // Clear all filters button
@@ -1051,7 +1384,7 @@
                 yearRangeMobile.value = 1900;
             }
 
-            fetchTracks(currentFilters.q, {});
+            fetchTracks(currentFilters.query, {});
         });
 
         // Event delegation for all sidebar filter clicks (desktop & mobile)
@@ -1065,7 +1398,7 @@
                 document.querySelectorAll('[data-sort-by]').forEach(link => link.classList.remove('active-filter'));
                 // Add active class to current sort link
                 target.classList.add('active-filter');
-                fetchTracks(currentFilters.q, currentFilters.filter_by, target.dataset.sortBy);
+                fetchTracks(currentFilters.query, currentFilters.filter_by, target.dataset.sortBy);
             }
             
             // Handle Clear button for specific facets
@@ -1085,7 +1418,7 @@
                         yearRangeMobile.value = 1900;
                     }
                 }
-                fetchTracks(currentFilters.q, newFilters, currentSortBy);
+                fetchTracks(currentFilters.query, newFilters, currentSortBy);
             }
         });
 
@@ -1172,7 +1505,7 @@
         if (applyFiltersMobileBtn) {
             applyFiltersMobileBtn.addEventListener('click', () => {
                 // For simplicity, directly re-fetch with current global filters state
-                fetchTracks(currentFilters.q, currentFilters.filter_by, currentSortBy);
+                fetchTracks(currentFilters.query, currentFilters.filter_by, currentSortBy);
                 if (closeMobileFilters) closeMobileFilters.click(); // Close drawer after applying
             });
         }

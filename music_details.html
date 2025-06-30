@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="track-detail-title">Harmonia - Track Details</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #1a202c; /* dark gray */
+            color: #e2e8f0; /* light gray */
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #4f46e5 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .neon-glow-card {
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.4); /* Indigo-400 glow */
+            transition: box-shadow 0.3s ease;
+        }
+        .neon-glow-card:hover {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.7);
+        }
+        /* Track item hover effect - specific for detail page */
+        .track-item {
+            transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+            cursor: pointer;
+        }
+        .track-item:hover {
+            transform: translateY(-2px);
+            background-color: rgba(79, 70, 229, 0.1); /* Indigo-600 with opacity */
+            border-color: #4f46e5; /* Indigo-600 */
+        }
+        .rating-stars {
+            color: #fbbf24; /* Yellow-400 for stars */
+        }
+        .audio-waveform {
+            background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='36' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 18 L3 14 L6 24 L9 10 L12 20 L15 16 L18 26 L21 8 L24 30 L27 4 L30 28 L33 16 L36 22 L39 12 L42 24 L45 18 L48 6 L51 32 L54 2 L57 28 L60 14 L63 22 L66 6 L69 26 L72 18 L75 12 L78 22 L81 8 L84 30 L87 4 L90 24 L93 16 L96 28 L99 18 L102 10 L105 26 L108 6 L111 30 L114 2 L117 22 L120 12 L123 28 L126 4 L129 32 L132 6 L135 26 L138 14 L141 22 L144 8 L147 30 L150 16 L153 22 L156 10 L159 20 L162 6 L165 26 L168 14 L171 30 L174 4 L177 24 L180 16 L183 28 L186 8 L189 32 L192 12 L195 22 L198 201 28' stroke='%236366f1' stroke-width='1.5' fill='none' opacity='0.8'/%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            height: 36px;
+        }
+        .audio-progress-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #818cf8 var(--progress, 0%), #3730a3 var(--progress, 0%)); /* Indigo-300 to Indigo-700 */
+            border-radius: 2px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <header class="bg-gray-900 border-b border-indigo-900 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
+                        <i class="fas fa-music text-white"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold gradient-text">Harmonia</h1>
+                </div>
+
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-indigo-400 font-medium hover:text-indigo-300 transition-colors">Home</a>
+                    <a href="#" class="text-gray-400 font-medium hover:text-indigo-400 transition-colors">Discover</a>
+                    <a href="#" class="text-gray-400 font-medium hover:text-indigo-400 transition-colors">Genres</a>
+                    <a href="#" class="text-gray-400 font-medium hover:text-indigo-400 transition-colors">Charts</a>
+                    <a href="#" class="text-gray-400 font-medium hover:text-indigo-400 transition-colors">Artists</a>
+                </nav>
+
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-indigo-400 transition-colors">
+                        <i class="far fa-heart"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-indigo-400 transition-colors">
+                        <i class="far fa-user"></i>
+                    </a>
+                    <button class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 px-4 rounded-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all">
+                        Sign Up
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <section id="track-details-section" class="bg-gray-800 rounded-xl shadow-lg border border-indigo-900 overflow-hidden md:flex neon-glow-card">
+            <div class="md:w-1/3 p-4 flex items-center justify-center bg-gray-900">
+                <img id="track-cover" src="https://via.placeholder.com/300x300?text=Loading..." alt="Track Cover" class="w-64 h-64 md:w-full md:h-auto object-cover rounded-lg shadow-md border-2 border-indigo-700">
+            </div>
+            <div class="md:w-2/3 p-6 text-gray-100">
+                <h1 id="track-title" class="text-4xl md:text-5xl font-bold gradient-text mb-3 leading-tight">Loading Track...</h1>
+                <p id="track-artist" class="text-xl text-indigo-300 mb-2"></p>
+                <p id="track-album" class="text-lg text-gray-400 mb-4"></p>
+
+                <div class="flex flex-wrap gap-2 mb-4" id="track-genres"></div>
+                <div class="flex items-center text-xl text-gray-200 mb-4">
+                    <span id="track-rating-value" class="font-bold mr-2"></span>
+                    <div id="track-rating-stars" class="rating-stars flex items-center text-xl"></div>
+                    <span id="track-play-count" class="text-sm text-gray-400 ml-3"></span>
+                </div>
+
+                <p id="track-description" class="text-gray-300 leading-relaxed mb-6"></p>
+
+                <div class="mb-6">
+                    <p class="font-semibold">Released: <span id="track-release-year" class="font-normal text-gray-400"></span></p>
+                    <p class="font-semibold">Duration: <span id="track-duration" class="font-normal text-gray-400"></span></p>
+                    <p class="font-semibold">BPM: <span id="track-tempo" class="font-normal text-gray-400"></span></p>
+                    <p class="font-semibold">Mood: <span id="track-mood" class="font-normal text-gray-400"></span></p>
+                </div>
+
+                <div class="flex flex-col items-center bg-gray-900 p-4 rounded-lg border border-indigo-800 mt-6">
+                    <div class="w-full mb-3 flex justify-between items-center text-gray-400 text-sm">
+                        <span>0:00</span>
+                        <div class="audio-waveform w-48 h-9 my-auto"></div>
+                        <span id="player-current-duration"></span>
+                    </div>
+                    <div class="audio-progress-bar w-full mb-3" style="--progress: 30%;"></div>
+                    <div class="flex items-center space-x-6 text-2xl text-gray-300">
+                        <button class="hover:text-indigo-400 transition-colors"><i class="fas fa-backward"></i></button>
+                        <button class="text-indigo-400 hover:text-purple-400 transition-colors text-4xl"><i class="fas fa-play-circle"></i></button>
+                        <button class="hover:text-indigo-400 transition-colors"><i class="fas fa-forward"></i></button>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4 mt-8">
+                    <button class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-colors flex items-center">
+                        <i class="fas fa-music mr-2"></i> Play Full Track
+                    </button>
+                    <button class="bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold py-3 px-6 rounded-lg transition-colors flex items-center">
+                        <i class="far fa-heart mr-2"></i> Add to Favorites
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-12">
+            <h2 class="text-3xl font-bold text-white mb-6 gradient-text">More Like This</h2>
+            <div id="recommendations-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <p class="col-span-full text-center text-gray-400">Loading recommendations...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 py-10 border-t border-gray-800">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
+                            <i class="fas fa-music text-white text-xs"></i>
+                        </div>
+                        <h4 class="text-lg font-bold gradient-text">Harmonia</h4>
+                    </div>
+                    <p class="text-gray-500 text-sm">Harmonia is your premier music discovery platform. Find your perfect sound across millions of tracks from artists around the world.</p>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold text-white mb-4">Explore</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Home</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Discover</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Genres</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Charts</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Artists</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold text-white mb-4">Community</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">For Artists</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Developer API</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Partners</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Blog</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Community Guidelines</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold text-white mb-4">Support</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Help Center</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Copyright</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-indigo-400 transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_KEY = 'sk_43133c09_4813181f1f39ff42b605b2c9fb2ebb3fd6c1de4d10fd772f07254d5b8ebfb526';
+        const BASE_SEARCH_URL = 'https://vectorhookcom-production.up.railway.app/api/collections/music-directory/vector-search';
+        const SIMILAR_TRACKS_URL = 'https://vectorhookcom-production.up.railway.app/api/collections/music-directory/similar'; // Renamed from SIMILAR_MOVIES_URL
+
+        // UI Elements for music details
+        const trackDetailTitle = document.getElementById('track-detail-title');
+        const trackCover = document.getElementById('track-cover');
+        const trackTitle = document.getElementById('track-title');
+        const trackArtist = document.getElementById('track-artist');
+        const trackAlbum = document.getElementById('track-album');
+        const trackGenres = document.getElementById('track-genres');
+        const trackRatingValue = document.getElementById('track-rating-value');
+        const trackRatingStars = document.getElementById('track-rating-stars');
+        const trackPlayCount = document.getElementById('track-play-count');
+        const trackDescription = document.getElementById('track-description'); // Assuming music data has 'description'
+        const trackReleaseYear = document.getElementById('track-release-year');
+        const trackDuration = document.getElementById('track-duration');
+        const trackTempo = document.getElementById('track-tempo');
+        const trackMood = document.getElementById('track-mood');
+        const recommendationsGrid = document.getElementById('recommendations-grid');
+
+        // Helper: Format duration from seconds to MM:SS
+        function formatDuration(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.round(seconds % 60); // Round seconds
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // Helper: Create star icons for rating display (reused from main page)
+        function createRatingStars(rating) {
+            let starsHtml = '';
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 !== 0 && rating - fullStars >= 0.5; // Only show half if 0.5 or more
+
+            for (let i = 0; i < 5; i++) {
+                if (i < fullStars) {
+                    starsHtml += '<i class="fas fa-star"></i>';
+                } else if (hasHalfStar && i === fullStars) {
+                    starsHtml += '<i class="fas fa-star-half-alt"></i>';
+                } else {
+                    starsHtml += '<i class="far fa-star"></i>';
+                }
+            }
+            return starsHtml;
+        }
+
+        // Helper: Create a track card element for recommendations
+        function createTrackCard(track) {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-indigo-600 transition-all duration-300 group track-item';
+            
+            // Add click listener for navigation on recommended tracks
+            cardDiv.addEventListener('click', () => {
+                // Navigate to the current page with the new track ID, effectively reloading details
+                window.location.href = `music_details.html?id=${track.id}`;
+            });
+
+            cardDiv.innerHTML = `
+                <div class="relative">
+                    <img src="${track.cover_image || 'https://via.placeholder.com/300x300?text=No+Cover'}" alt="${track.title} Cover" class="w-full h-40 sm:h-44 object-cover transition-transform duration-300 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button class="bg-indigo-600 text-white p-3 rounded-full hover:bg-indigo-500 transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    <div class="absolute top-2 right-2">
+                        <button class="text-gray-300 hover:text-pink-400 transition-colors bg-gray-900 bg-opacity-50 p-2 rounded-full">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                    ${track.release_year === new Date().getFullYear() ? '<div class="absolute top-2 left-2"><span class="bg-indigo-500 text-white text-xs py-1 px-2 rounded-md">New</span></div>' : ''}
+                </div>
+                <div class="p-4">
+                    <h3 class="text-white font-medium truncate">${track.title}</h3>
+                    <p class="text-gray-400 text-sm truncate mt-1">${track.artist}</p>
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="text-xs text-gray-500">${formatDuration(track.duration)}</span>
+                        <div class="flex items-center space-x-1">
+                            <div class="flex text-yellow-400 text-xs">
+                                ${createRatingStars(track.rating || 0)}
+                            </div>
+                            <span class="text-xs text-gray-500">(${track.play_count ? track.play_count.toLocaleString() : '0'})</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return cardDiv;
+        }
+
+        // Function to display fetched track details on the page
+     function displayTrackDetails(track) {
+    trackDetailTitle.textContent = `${track.title} by ${track.artist} - Harmonia`;
+    trackCover.src = track.cover_image || 'https://via.placeholder.com/300x300?text=No+Cover';
+    trackCover.alt = `${track.title} Cover`;
+    trackTitle.textContent = track.title;
+    trackArtist.textContent = track.artist;
+    trackAlbum.textContent = track.album || 'Unknown Album';
+    
+    // --- FIX FOR GENRE AND MOOD ---
+    // Ensure genre is an array before mapping. If it's a string, convert it to a single-element array.
+    // If it's null/undefined/empty, display N/A.
+    const genresArray = Array.isArray(track.genre) ? track.genre : (typeof track.genre === 'string' && track.genre !== '' ? [track.genre] : []);
+    trackGenres.innerHTML = genresArray.length > 0
+        ? genresArray.map(g => `<span class="bg-indigo-900 text-indigo-300 text-xs px-2 py-1 rounded-full">${g}</span>`).join('')
+        : '<span class="text-gray-500 text-sm">N/A</span>';
+
+    trackRatingValue.textContent = track.rating ? track.rating.toFixed(1) : 'N/A';
+    trackRatingStars.innerHTML = createRatingStars(track.rating || 0);
+    trackPlayCount.textContent = `(${track.play_count ? track.play_count.toLocaleString() : '0'} plays)`;
+
+    trackDescription.textContent = track.description || 'No description available for this track.';
+    trackReleaseYear.textContent = track.release_year || 'N/A';
+    trackDuration.textContent = formatDuration(track.duration || 0);
+    trackTempo.textContent = track.tempo || 'N/A';
+
+    // Ensure mood is an array or handled correctly before joining.
+    const moodsArray = Array.isArray(track.mood) ? track.mood : (typeof track.mood === 'string' && track.mood !== '' ? [track.mood] : []);
+    trackMood.textContent = moodsArray.length > 0 ? moodsArray.join(', ') : 'N/A';
+    // --- END FIX ---
+
+    // Update player duration if it has a specific element for it
+    const playerCurrentDuration = document.getElementById('player-current-duration');
+    if(playerCurrentDuration) {
+        playerCurrentDuration.textContent = formatDuration(track.duration || 0);
+    }
+}
+
+        // Fetch track details by ID using filter_by for exact match
+        async function fetchTrackDetails(trackId) {
+            try {
+                const response = await fetch(`${BASE_SEARCH_URL}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-API-KEY': API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: "*", // Query all, as we're filtering by ID
+                        filter_by: `id:=${trackId}`, // Crucial for exact ID match
+                        per_page: 1
+                    })
+                });
+                const data = await response.json();
+                if (data.success && data.data.hits.length > 0) {
+                    return data.data.hits[0].document;
+                }
+                return null;
+            } catch (error) {
+                console.error('Error fetching track details:', error);
+                return null;
+            }
+        }
+
+        // Fetch similar tracks (recommendations) for a given track ID
+        async function fetchSimilarTracks(trackId) {
+            recommendationsGrid.innerHTML = '<p class="col-span-full text-center text-gray-400">Loading recommendations...</p>';
+            const payload = {
+                id: trackId,
+                k: 5, // Number of nearest neighbors to search
+                per_page: 4, // Number of results to return
+                // You can add more specific filters here if needed, e.g., to exclude the current track
+                filter_by: `id:!=${trackId}` // Exclude the current track from recommendations
+            };
+
+            try {
+                const response = await fetch(SIMILAR_TRACKS_URL, {
+                    method: 'POST',
+                    headers: {
+                        'X-API-KEY': API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (data.success && data.data.hits.length > 0) {
+                    recommendationsGrid.innerHTML = ''; // Clear loading text
+                    data.data.hits.forEach(hit => {
+                        recommendationsGrid.appendChild(createTrackCard(hit.document));
+                    });
+                } else {
+                    recommendationsGrid.innerHTML = '<p class="col-span-full text-center text-gray-400">No recommendations found.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching similar tracks:', error);
+                recommendationsGrid.innerHTML = '<p class="col-span-full text-center text-red-500">Error loading recommendations.</p>';
+            }
+        }
+
+        // Initialize the page on DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const trackId = urlParams.get('id');
+            console.log('Track ID retrieved from URL:', trackId);
+
+            if (trackId) {
+                const track = await fetchTrackDetails(trackId);
+                if (track) {
+                    displayTrackDetails(track);
+                    fetchSimilarTracks(trackId); // Fetch recommendations for the current track
+                } else {
+                    trackTitle.textContent = 'Track Not Found';
+                    trackDescription.textContent = 'The requested track could not be loaded.';
+                    trackCover.src = 'https://via.placeholder.com/300x300?text=Track+Not+Found';
+                    recommendationsGrid.innerHTML = '<p class="col-span-full text-center text-gray-400">No recommendations available.</p>';
+                }
+            } else {
+                trackTitle.textContent = 'No Track ID Provided';
+                trackDescription.textContent = 'Please select a track from the main page to view its details.';
+                trackCover.src = 'https://via.placeholder.com/300x300?text=Select+a+Track';
+                recommendationsGrid.innerHTML = '<p class="col-span-full text-center text-gray-400">No recommendations available.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
